@@ -46,7 +46,7 @@ public class TransliteratorImpl implements Transliterator {
         StringBuilder result = new StringBuilder(source);
         if (checkCyrillicAlphabet(source)) {
             for (int i = 0; i < result.length(); i++) {
-                if (result.charAt(i) > 'А' && result.charAt(i) < 'Я') {
+                if (result.charAt(i) >= 'А' && result.charAt(i) <= 'Я') {
                     String newValue = translits.get(result.charAt(i));
                     result.replace(i, i + 1, newValue);
                 }
