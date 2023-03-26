@@ -9,9 +9,18 @@ import java.sql.SQLException;
 public class FileSorterTest {
     public static void main(String[] args) throws SQLException {
         DataSource dataSource = initDb();
-        File data = new File("data.txt");
+        File data = new File("src/main/java/thirdWeek/fileSort/data.txt");
         FileSorter fileSorter = new FileSortImpl(dataSource);
+
+        double startTime = System.currentTimeMillis();
         File res = fileSorter.sort(data);
+        double endTime = System.currentTimeMillis();
+
+        System.out.printf("Время выполнения: %s мс.\n", (endTime - startTime));
+        System.out.printf("Время выполнения: %f сек.\n", (endTime - startTime) / 1000);
+        System.out.printf("Время выполнения: %f мин.", (endTime - startTime) / 1000 / 60);
+        // С batch processing: 8 сек;
+        // Без batch processing: 104 сек
     }
 
     public static DataSource initDb() throws SQLException {
