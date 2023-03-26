@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class Test {
     public static void main(String[] args) throws IOException {
-        File dataFile = new Generator().generate(DirectoryName.DIRECTORY_NAME + "/data.txt", 375_000_000);
+        File dataFile = new Generator().generate(DirectoryName.DIRECTORY_NAME + "/data.txt", 1_000_000);
         System.out.println(new Validator(dataFile).isSorted()); // false
         double startTime = System.currentTimeMillis();
         File sortedFile = new Sorter().sortFile(dataFile);

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Sorter {
     private static final int MAX_SIZE_CHUNK = 1024 * 1024 * 10; // 10 MB
-    private final File directoryForSavingTemp = new File(DirectoryName.DIRECTORY_NAME + "/temp");
+    private final File directoryForSavingTemp = new File(DirectoryName.DIRECTORY_NAME);
 
     public File sortFile(File dataFile) throws IOException {
         List<File> sortedChunks = getSortedChunks(dataFile);
