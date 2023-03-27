@@ -1,9 +1,12 @@
 package fourthWeek.io.ylab.intensive.lesson04.eventsourcing.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import fourthWeek.io.ylab.intensive.lesson04.eventsourcing.Message;
+import fourthWeek.io.ylab.intensive.lesson04.eventsourcing.MessageType;
 import fourthWeek.io.ylab.intensive.lesson04.eventsourcing.Person;
 import fourthWeek.io.ylab.intensive.lesson04.eventsourcing.ValueForRabbitMQ;
 
@@ -28,22 +31,30 @@ public class PersonApiImpl implements PersonApi {
 
     @Override
     public void deletePerson(Long personId) {
-        sendMessage(String.valueOf(personId));
+        Message message = new Message(MessageType.DELETE, new Person(personId));
+        sendMessage(message);
     }
 
     @Override
     public void savePerson(Long personId, String firstName, String lastName, String middleName) {
-        String message = personId + ";" + firstName + ";" + lastName + ";" + middleName;
+        Message message = new Message(
+                MessageType.SAVE,
+                new Person(personId, firstName, lastName, middleName));
         sendMessage(message);
     }
 
-    private void sendMessage(String message) {
+    private void sendMessage(Message message) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try (Connection connection = connectionFactory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(ValueForRabbitMQ.EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
             channel.queueDeclare(ValueForRabbitMQ.QUEUE_NAME, false, false, false, null);
             channel.queueBind(ValueForRabbitMQ.QUEUE_NAME, ValueForRabbitMQ.EXCHANGE_NAME, "*");
-            channel.basicPublish(ValueForRabbitMQ.EXCHANGE_NAME, "*", false, null, message.getBytes());
+            channel.basicPublish(ValueForRabbitMQ.EXCHANGE_NAME,
+                    "*",
+                    false,
+                    null,
+                    objectMapper.writeValueAsBytes(message));
             System.out.println("Сообщение отправлено успешно");
         } catch (Exception e) {
             System.out.println("Ошибка при отправке сообщения");
@@ -86,7 +97,7 @@ public class PersonApiImpl implements PersonApi {
         try (java.sql.Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(findPersonByIdSql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 Person foundPerson = new Person(
                         resultSet.getLong("person_id"),
                         resultSet.getString("first_name"),

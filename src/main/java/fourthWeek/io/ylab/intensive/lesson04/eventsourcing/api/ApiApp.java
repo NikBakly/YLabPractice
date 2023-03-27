@@ -18,8 +18,9 @@ public class ApiApp {
         personApi.savePerson(2L, "Cat", "May", "Mur");
         personApi.savePerson(3L, "Anya", "Hishek", "Bonchok");
         personApi.savePerson(1L, "Petya", "Gamakov", "Cod");
-        personApi.deletePerson(5L);
         TimeUnit.SECONDS.sleep(3);
+        System.out.println(personApi.findAll());
+        personApi.deletePerson(5L);
         System.out.println(personApi.findPerson(8L));
         System.out.println(personApi.findPerson(1L));
         System.out.println(personApi.findPerson(3L));

@@ -9,6 +9,10 @@ public class Person {
     public Person() {
     }
 
+    public Person(Long id) {
+        this.id = id;
+    }
+
     public Person(Long id, String firstName, String lastName, String middleName) {
         this.id = id;
         this.firstName = firstName;
