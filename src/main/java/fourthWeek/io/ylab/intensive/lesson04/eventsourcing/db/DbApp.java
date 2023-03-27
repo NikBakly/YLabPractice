@@ -11,8 +11,8 @@ public class DbApp {
     public static void main(String[] args) throws Exception {
         DataSource dataSource = initDb();
         ConnectionFactory connectionFactory = initMQ();
-
-        // тут пишем создание и запуск приложения работы с БД
+        Consumer consumer = new Consumer(connectionFactory, dataSource);
+        consumer.listeningMessages();
     }
 
     private static ConnectionFactory initMQ() throws Exception {
@@ -22,12 +22,12 @@ public class DbApp {
     private static DataSource initDb() throws SQLException {
         String ddl = ""
                 + "drop table if exists person;"
-                + "create if not exists table person (\n"
+                + "create table if not exists person (\n"
                 + "person_id bigint primary key,\n"
                 + "first_name varchar,\n"
                 + "last_name varchar,\n"
                 + "middle_name varchar\n"
-                + ")";
+                + ");";
         DataSource dataSource = DbUtil.buildDataSource();
         DbUtil.applyDdl(ddl, dataSource);
         return dataSource;
