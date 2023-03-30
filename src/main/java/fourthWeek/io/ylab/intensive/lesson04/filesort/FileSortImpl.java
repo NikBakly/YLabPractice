@@ -22,11 +22,11 @@ public class FileSortImpl implements FileSorter {
                         "FROM numbers " +
                         "ORDER BY val DESC;";
 
+        addNumbersWithBatchProcessing(data);
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectSql);
              ResultSet resultSet = preparedStatement.executeQuery();
              FileWriter fileWriter = new FileWriter(result, false)) {
-            addNumbersWithBatchProcessing(data);
             while (resultSet.next()) {
                 long value = resultSet.getLong("val");
                 fileWriter.write(value + "\n");
@@ -37,7 +37,7 @@ public class FileSortImpl implements FileSorter {
         return null;
     }
 
-    private void addNumbersWithBatchProcessing(File data) throws SQLException, IOException {
+    private void addNumbersWithBatchProcessing(File data) {
         final int BATCH_SIZE = 35;
 
         String insertSql =
@@ -45,6 +45,7 @@ public class FileSortImpl implements FileSorter {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(data));
              Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSql)) {
+            connection.setAutoCommit(false);
             int i = 1;
             while (bufferedReader.ready()) {
                 long value = Long.parseLong(bufferedReader.readLine());
@@ -52,9 +53,12 @@ public class FileSortImpl implements FileSorter {
                 preparedStatement.addBatch();
                 if (i % BATCH_SIZE == 0 || !bufferedReader.ready()) {
                     preparedStatement.executeBatch();
+                    connection.commit();
                 }
                 ++i;
             }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

@@ -15,64 +15,72 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public void deletePerson(Long personId) {
-        try {
-            boolean isPerson = containsPersonById(personId);
-            if (isPerson) {
-                String deleteByPersonIdSql =
-                        "DELETE FROM person " +
-                                "WHERE person_id = ?;";
-                try (Connection connection = dataSource.getConnection();
-                     PreparedStatement preparedStatement = connection.prepareStatement(deleteByPersonIdSql)) {
-                    preparedStatement.setLong(1, personId);
-                    preparedStatement.executeUpdate();
-                    System.out.printf("Объект Person с id=%d успешно обновлен", personId);
-                } catch (SQLException e) {
-                    System.out.println("Ошибка при удалении объекта Person");
-                    System.out.println(e.getMessage());
-                }
-            } else {
-                System.out.printf("Person с id=%d не найден\n", personId);
+        if (containsPersonById(personId)) {
+            String deleteByPersonIdSql =
+                    "DELETE FROM person " +
+                            "WHERE person_id = ?;";
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(deleteByPersonIdSql)) {
+                preparedStatement.setLong(1, personId);
+                preparedStatement.executeUpdate();
+                System.out.printf("Объект Person с id=%d успешно обновлен", personId);
+            } catch (SQLException e) {
+                System.out.println("Ошибка при удалении объекта Person");
+                System.out.println(e.getMessage());
             }
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } else {
+            System.out.printf("Person с id=%d не найден\n", personId);
         }
-
     }
 
     @Override
     public void savePerson(Long personId, String firstName, String lastName, String middleName) {
-        try {
-            boolean isPerson = containsPersonById(personId);
-            String sql;
-            if (isPerson) {
-                sql = "UPDATE person SET first_name = ?, last_name = ?, middle_name = ? " +
-                        " WHERE person_id = ?;";
-            } else {
-                sql = "INSERT INTO person (person_id, first_name, last_name, middle_name) VALUES (?, ?, ?, ?);";
-            }
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                if (isPerson) {
-                    preparedStatement.setString(1, firstName);
-                    preparedStatement.setString(2, lastName);
-                    preparedStatement.setString(3, middleName);
-                    preparedStatement.setLong(4, personId);
-                    System.out.printf("Объект Person с id=%d успешно обновлен \n", personId);
-                } else {
-                    preparedStatement.setLong(1, personId);
-                    preparedStatement.setString(2, firstName);
-                    preparedStatement.setString(3, lastName);
-                    preparedStatement.setString(4, middleName);
-                    System.out.printf("Объект Person с id=%d успешно добавлен \n", personId);
-                }
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                System.out.println("Ошибка во время сохранения объекта Person");
-            }
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        String sql;
+        boolean isPerson = containsPersonById(personId);
+        if (isPerson) {
+            sql = "UPDATE person SET first_name = ?, last_name = ?, middle_name = ? " +
+                    " WHERE person_id = ?;";
+        } else {
+            sql = "INSERT INTO person (person_id, first_name, last_name, middle_name) VALUES (?, ?, ?, ?);";
         }
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            if (isPerson) {
+                setUpdate(preparedStatement, firstName, lastName, middleName, personId);
+            } else {
+                setSave(preparedStatement, personId, firstName, lastName, middleName);
+            }
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Ошибка во время сохранения объекта Person");
+        }
+
     }
+
+    private void setUpdate(PreparedStatement preparedStatement,
+                           String firstName,
+                           String lastName,
+                           String middleName,
+                           Long personId) throws SQLException {
+        preparedStatement.setString(1, firstName);
+        preparedStatement.setString(2, lastName);
+        preparedStatement.setString(3, middleName);
+        preparedStatement.setLong(4, personId);
+        System.out.printf("Объект Person с id=%d успешно обновлен \n", personId);
+    }
+
+    private void setSave(PreparedStatement preparedStatement,
+                         Long personId,
+                         String firstName,
+                         String lastName,
+                         String middleName) throws SQLException {
+        preparedStatement.setLong(1, personId);
+        preparedStatement.setString(2, firstName);
+        preparedStatement.setString(3, lastName);
+        preparedStatement.setString(4, middleName);
+        System.out.printf("Объект Person с id=%d успешно добавлен \n", personId);
+    }
+
 
     private boolean containsPersonById(Long personId) throws RuntimeException {
         if (personId == null) {

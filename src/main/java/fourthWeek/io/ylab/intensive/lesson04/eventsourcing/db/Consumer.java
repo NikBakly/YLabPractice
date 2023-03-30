@@ -1,5 +1,6 @@
 package fourthWeek.io.ylab.intensive.lesson04.eventsourcing.db;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -20,27 +21,33 @@ public class Consumer {
         this.personDao = new PersonDaoImpl(dataSource);
     }
 
-    public void listeningMessages() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void listeningMessages() {
         try (Connection connection = connectionFactory.newConnection();
              Channel channel = connection.createChannel()) {
             while (!Thread.currentThread().isInterrupted()) {
                 GetResponse response = channel.basicGet(ValueForRabbitMQ.QUEUE_NAME, true);
                 if (response != null) {
-                    String acceptedMessage = new String(response.getBody());
-                    Message message = objectMapper.readValue(acceptedMessage, Message.class);
-                    if (message.getMessageType().equals(MessageType.DELETE)) {
-                        personDao.deletePerson(message.getPerson().getId());
-                    } else {
-                        personDao.savePerson(
-                                message.getPerson().getId(),
-                                message.getPerson().getFirstName(),
-                                message.getPerson().getLastName(),
-                                message.getPerson().getMiddleName()
-                        );
-                    }
+                    readMessage(response);
                 }
             }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void readMessage(GetResponse response) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String acceptedMessage = new String(response.getBody());
+        Message message = objectMapper.readValue(acceptedMessage, Message.class);
+        if (message.getMessageType().equals(MessageType.DELETE)) {
+            personDao.deletePerson(message.getPerson().getId());
+        } else {
+            personDao.savePerson(
+                    message.getPerson().getId(),
+                    message.getPerson().getFirstName(),
+                    message.getPerson().getLastName(),
+                    message.getPerson().getMiddleName()
+            );
         }
     }
 }

@@ -1,8 +1,8 @@
 package fourthWeek.io.ylab.intensive.lesson04.eventsourcing;
 
 public class Message {
-    private  MessageType messageType;
-    private  Person person;
+    private MessageType messageType;
+    private Person person;
 
     public Message() {
     }
