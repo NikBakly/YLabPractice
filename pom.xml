@@ -12,9 +12,10 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <org.postgresql.verion>42.2.6</org.postgresql.verion>
+        <org.postgresql.verion>42.5.4</org.postgresql.verion>
         <com.rabbitmq.verion>5.16.0</com.rabbitmq.verion>
-        <com.fasterxml.jackson.core.verion>2.13.3</com.fasterxml.jackson.core.verion>
+        <com.fasterxml.jackson.core.verion>2.14.2</com.fasterxml.jackson.core.verion>
+        <org.springframework.spring-context.version>6.0.6</org.springframework.spring-context.version>
     </properties>
 
     <dependencies>
@@ -32,6 +33,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${com.fasterxml.jackson.core.verion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${org.springframework.spring-context.version}</version>
         </dependency>
     </dependencies>
 </project>
