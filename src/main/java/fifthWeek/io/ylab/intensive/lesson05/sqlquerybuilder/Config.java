@@ -21,4 +21,9 @@ public class Config {
         dataSource.setPortNumber(5432);
         return dataSource;
     }
+
+    @Bean
+    public SQLQueryBuilder sqlQueryBuilder() {
+        return new SQLQueryBuilderImpl(dataSource());
+    }
 }
