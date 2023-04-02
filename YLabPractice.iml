@@ -5,6 +5,11 @@
       <configuration>
         <fileset id="fileset" name="Config" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/fifthWeek/io/ylab/intensive/lesson05/eventsourcing/api/Config.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/fifthWeek/io/ylab/intensive/lesson05/messagefilter/api/ConfigApi.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/fifthWeek/io/ylab/intensive/lesson05/messagefilter/app/Config.java</file>
+        </fileset>
+        <fileset id="fileset2" name="ConfigDb" removed="false">
+          <file>file://$MODULE_DIR$/src/main/java/fifthWeek/io/ylab/intensive/lesson05/messagefilter/db/ConfigDb.java</file>
         </fileset>
       </configuration>
     </facet>
