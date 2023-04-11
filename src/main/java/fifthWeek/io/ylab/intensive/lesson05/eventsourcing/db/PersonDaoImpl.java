@@ -33,27 +33,27 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public void savePerson(Long personId, String firstName, String lastName, String middleName) {
-        if (!personIdIsNull(personId)) {
-            String sql;
-            boolean isPerson = containsPersonById(personId);
+        if (personIdIsNull(personId)) {
+            return;
+        }
+        String sql;
+        boolean isPerson = containsPersonById(personId);
+        sql = "INSERT INTO person (person_id, first_name, last_name, middle_name) VALUES (?, ?, ?, ?);";
+        if (isPerson) {
+            sql = "UPDATE person SET first_name = ?, last_name = ?, middle_name = ? " +
+                    " WHERE person_id = ?;";
+        }
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             if (isPerson) {
-                sql = "UPDATE person SET first_name = ?, last_name = ?, middle_name = ? " +
-                        " WHERE person_id = ?;";
+                setUpdate(preparedStatement, firstName, lastName, middleName, personId);
             } else {
-                sql = "INSERT INTO person (person_id, first_name, last_name, middle_name) VALUES (?, ?, ?, ?);";
+                setSave(preparedStatement, personId, firstName, lastName, middleName);
             }
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                if (isPerson) {
-                    setUpdate(preparedStatement, firstName, lastName, middleName, personId);
-                } else {
-                    setSave(preparedStatement, personId, firstName, lastName, middleName);
-                }
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                System.out.print("Ошибка во время сохранения объекта Person:");
-                System.out.println(e.getMessage());
-            }
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.print("Ошибка во время сохранения объекта Person:");
+            System.out.println(e.getMessage());
         }
 
     }
@@ -87,7 +87,7 @@ public class PersonDaoImpl implements PersonDao {
         preparedStatement.setString(2, firstName);
         preparedStatement.setString(3, lastName);
         preparedStatement.setString(4, middleName);
-        System.out.printf("Объект Person с id=%d успешно добавлен\n", personId);
+        System.out.printf("Объект Person с id=%d успешно добавленlesson05/eventsourcing/db/PersonDaoImpl.java\n", personId);
     }
 
 

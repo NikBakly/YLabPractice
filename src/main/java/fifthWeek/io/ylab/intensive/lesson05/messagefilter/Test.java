@@ -15,10 +15,8 @@ public class Test {
         int rigthPointer = 0;
 
         while (rigthPointer < message.length()) {
-            if (checkCharByPointer(result, rigthPointer)) {
-                if (!checkCharByPointer(result, leftPointer)) {
-                    leftPointer = rigthPointer;
-                }
+            if (checkCharByPointer(result, rigthPointer) && !checkCharByPointer(result, leftPointer)) {
+                leftPointer = rigthPointer;
             } else {
                 if (checkCharByPointer(result, leftPointer)) {
                     String world = result.substring(leftPointer, rigthPointer);

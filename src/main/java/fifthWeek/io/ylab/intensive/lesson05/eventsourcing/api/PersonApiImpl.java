@@ -69,20 +69,15 @@ public class PersonApiImpl implements PersonApi {
                 "SELECT * " +
                         "FROM person " +
                         "WHERE person_id = ?";
+
         try (java.sql.Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(findPersonByIdSql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(findPersonByIdSql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             preparedStatement.setLong(1, personId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    foundPerson = new Person(
-                            resultSet.getLong("person_id"),
-                            resultSet.getString("first_name"),
-                            resultSet.getString("last_name"),
-                            resultSet.getString("middle_name")
-                    );
-                }
-                System.out.printf("Объект Person с id=%d успешно найден \n", personId);
+            if (resultSet.next()) {
+                foundPerson = getFoundPerson(resultSet);
             }
+            System.out.printf("Объект Person с id=%d успешно найден \n", personId);
         } catch (SQLException e) {
             System.out.println("Ошибка при поиске объекта Person");
         }
@@ -99,12 +94,7 @@ public class PersonApiImpl implements PersonApi {
              PreparedStatement preparedStatement = connection.prepareStatement(findPersonByIdSql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Person foundPerson = new Person(
-                        resultSet.getLong("person_id"),
-                        resultSet.getString("first_name"),
-                        resultSet.getString("last_name"),
-                        resultSet.getString("middle_name")
-                );
+                Person foundPerson = getFoundPerson(resultSet);
                 result.add(foundPerson);
             }
             System.out.println("Все объект Person найдены");
@@ -112,5 +102,14 @@ public class PersonApiImpl implements PersonApi {
             System.out.println("Ошибка при поиске всех объектов Person");
         }
         return result;
+    }
+
+    private Person getFoundPerson(ResultSet resultSet) throws SQLException {
+        return new Person(
+                resultSet.getLong("person_id"),
+                resultSet.getString("first_name"),
+                resultSet.getString("last_name"),
+                resultSet.getString("middle_name")
+        );
     }
 }
