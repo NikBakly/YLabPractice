@@ -3,11 +3,13 @@ package fifthWeek.io.ylab.intensive.lesson05.eventsourcing.api;
 import com.rabbitmq.client.ConnectionFactory;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
 @Configuration
+@ComponentScan("fifthWeek.io.ylab.intensive.lesson05.eventsourcing.api")
 public class Config {
 
     @Bean
@@ -30,5 +32,10 @@ public class Config {
         connectionFactory.setPassword("guest");
         connectionFactory.setVirtualHost("/");
         return connectionFactory;
+    }
+
+    @Bean
+    public PersonApi personApi() {
+        return new PersonApiImpl(connectionFactory(), dataSource());
     }
 }

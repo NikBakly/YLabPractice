@@ -1,17 +1,13 @@
-package fifthWeek.io.ylab.intensive.lesson05.messagefilter;
+package fifthWeek.io.ylab.intensive.lesson05.messagefilter.api;
 
 import com.rabbitmq.client.ConnectionFactory;
-import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
-
 @Configuration
-@ComponentScan("fifthWeek.io.ylab.intensive.lesson05.messagefilter")
-public class Config {
-
+@ComponentScan("fifthWeek.io.ylab.intensive.lesson05.messagefilter.api")
+public class ConfigApi {
     @Bean
     public ConnectionFactory connectionFactory() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -24,13 +20,17 @@ public class Config {
     }
 
     @Bean
-    public DataSource dataSource() {
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setServerName("localhost");
-        dataSource.setUser("postgres");
-        dataSource.setPassword("postgres");
-        dataSource.setDatabaseName("postgres");
-        dataSource.setPortNumber(5432);
-        return dataSource;
+    public ConsumerApi consumerApi() {
+        return new ConsumerApi(connectionFactory());
+    }
+
+    @Bean
+    public ProducerApi producerApi() {
+        return new ProducerApi(connectionFactory());
+    }
+
+    @Bean
+    public ApiController apiController() {
+        return new ApiController(consumerApi(), producerApi());
     }
 }
